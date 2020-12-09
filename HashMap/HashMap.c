@@ -187,7 +187,7 @@ void insert_two_buckets_with_different_index(void** state)
 void insert_two_buckets_with_same_index_and_different_keys(void** state)
 {
     int data1 = 10;
-    int data2 = 10;
+    int data2 = 20;
     char* key1 = "AC";
     char* key2 = "CA";
     HashMap* hm = create_hashmap(10);
@@ -195,6 +195,20 @@ void insert_two_buckets_with_same_index_and_different_keys(void** state)
     insert_data(hm, key2, &data2, &resolve_collision);
 
     assert_ptr_equal(get_data(hm, key1), &data1);
+    assert_ptr_equal(get_data(hm, key2), &data2);
+}
+
+void insert_two_buckets_with_same_keys(void** state)
+{
+    int data1 = 10;
+    int data2 = 20;
+    char* key1 = "AC";
+    char* key2 = "AC";
+    HashMap* hm = create_hashmap(10);
+    insert_data(hm, key1, &data1, &resolve_collision);
+    insert_data(hm, key2, &data2, &resolve_collision);
+
+    assert_ptr_equal(get_data(hm, key1), &data2);
     assert_ptr_equal(get_data(hm, key2), &data2);
 }
 
@@ -231,6 +245,8 @@ int main() {
         cmocka_unit_test(insert_one_bucket),
         cmocka_unit_test(insert_two_buckets_with_different_index),
         cmocka_unit_test(insert_two_buckets_with_same_index_and_different_keys),
+        cmocka_unit_test(insert_two_buckets_with_same_keys),
+        
         
         
     };
