@@ -156,7 +156,6 @@ void remove_data(HashMap* hm, char* key, void (*destroy_data)(void* data)) {
 
     if (strcmp(temp->key, key) == 0 && temp->next == NULL)
     {
-        free(temp->key);
         free(temp);
         hm->buckets[index] = NULL;
         return;
@@ -168,7 +167,6 @@ void remove_data(HashMap* hm, char* key, void (*destroy_data)(void* data)) {
     if (strcmp(previous->key, key)==0) 
     {
         hm->buckets[index] = previous->next;
-        free(previous->key);
         free(previous);
         return;
     }
@@ -178,7 +176,6 @@ void remove_data(HashMap* hm, char* key, void (*destroy_data)(void* data)) {
         if (strcmp(current->key, key) == 0)
         {
             previous->next=current->next;
-            free(previous->key);
             free(previous);
             return;
         }
