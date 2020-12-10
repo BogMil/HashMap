@@ -19,7 +19,7 @@ typedef struct bucket {
 typedef struct hashMap {
     Bucket** buckets;
     size_t key_space;
-    unsigned int(*hash)(char*);
+    int(*hash)(char*);
 } HashMap;
 
 unsigned int hash(char* key) {
@@ -31,20 +31,21 @@ unsigned int hash(char* key) {
 }
 
 
-
-
 void _allocate_and_zeroify_buckets_memory(HashMap* hm, size_t key_space) {
-    hm->buckets = calloc(key_space, sizeof(Bucket*));
+    //hm->buckets = calloc(key_space, sizeof(Bucket*));
+    hm->buckets = (Bucket**)calloc(key_space , sizeof(Bucket*));
 
-    if (!hm->buckets) {
-        perror("Error allocating buckets");
-        abort();
+    for (int i = 0; i < key_space; i++) {
+        hm->buckets[i] = (Bucket *)calloc(1,sizeof(Bucket));
+        hm->buckets[i] = NULL;
     }
-    memset(hm->buckets, 0, sizeof(Bucket) * key_space);
+
+    //memset(hm->buckets, 0, sizeof(Bucket) * key_space);
 }
 
 int _get_bucket_index_for_key(HashMap *hm, char* key) {
-    return hm->hash(key) % hm->key_space;
+    int hash = hm->hash(key);
+    return hash % hm->key_space;
 }
 
 void _put_bucket(HashMap * hm, Bucket *bucket) {
@@ -73,11 +74,11 @@ void _put_bucket(HashMap * hm, Bucket *bucket) {
 }
 
 HashMap* create_hashmap(size_t key_space) {
-    HashMap* hm = calloc(1,sizeof(HashMap));
-
-    hm->key_space = key_space;
+    HashMap* hm= (HashMap *)calloc(1,sizeof(HashMap));
+    //hm->key_space = key_space;
     _allocate_and_zeroify_buckets_memory(hm, key_space);
     hm->hash = hash;
+    hm->key_space = key_space;
     return hm;
 }
 
@@ -111,11 +112,13 @@ void insert_data(HashMap * hm, char* key, void* data, void* (*resolve_collision)
 
     Bucket* bucket =(Bucket*) calloc(1, sizeof(Bucket));
     
-    bucket->key = (char*)calloc(strlen(key), sizeof(char));
-    strcpy(bucket->key, key);
 
+    char *copiedKey = (char*)calloc(strlen(key), sizeof(char));
+    strcpy(copiedKey , key);
+
+    bucket->key = copiedKey;
     bucket->data = data_to_store;
-    bucket->next = NULL;
+
     _put_bucket(hm, bucket);
 }
 
@@ -211,6 +214,7 @@ void hash_returns_expected_int(void** state)
 void created_hashmap_has_exact_key_space(void** state)
 {
     HashMap* hm = create_hashmap(10);
+
     assert_int_equal(hm->key_space, 10);
 }
 
